@@ -1,0 +1,244 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:root {
+  --ink: #1a0733;
+  --paper: #fff8c9;
+  --pink: #ff4fb3;
+  --lime: #6cff4a;
+  --sky: #5ce1ff;
+  --sun: #ffe600;
+  --grape: #a35cff;
+}
+
+html {
+  font-size: 18px;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Comic Sans MS", "Comic Sans", "Chalkboard SE", "Trebuchet MS",
+    sans-serif;
+  background: radial-gradient(circle at 20% 20%, var(--pink), transparent 52%),
+    radial-gradient(circle at 82% 8%, var(--lime), transparent 48%),
+    radial-gradient(circle at 82% 80%, var(--sky), transparent 55%),
+    linear-gradient(125deg, var(--sun), var(--sky) 40%, var(--grape));
+  color: var(--ink);
+}
+
+.page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.25rem 1rem 2.75rem;
+}
+
+.banner {
+  text-align: center;
+  padding: 1rem 0.85rem;
+  border: 0.65rem dashed var(--ink);
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 10px 10px 0 var(--pink), 14px 14px 0 var(--lime);
+  transform: rotate(-0.75deg);
+}
+
+.kicker {
+  margin: 0;
+  letter-spacing: 0.06em;
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 1rem;
+}
+
+h1.title {
+  margin: 0.35rem 0 0;
+  font-size: clamp(1.95rem, 5vw, 2.95rem);
+  line-height: 1.06;
+}
+
+.sub {
+  margin: 0.5rem auto 0;
+  max-width: 38rem;
+  font-weight: 700;
+  font-size: 1.06rem;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  margin: 1.2rem auto 1.05rem;
+  font-weight: 800;
+}
+
+.pill {
+  padding: 0.35rem 0.72rem;
+  border-radius: 999px;
+  border: 0.31rem solid var(--ink);
+  background: #fff;
+  box-shadow: 4px 4px 0 var(--grape);
+}
+
+.pill.warn {
+  background: var(--sun);
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-bottom: 1.05rem;
+}
+
+button.sim {
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 900;
+  letter-spacing: 0.03em;
+  border: 0.43rem solid var(--ink);
+  border-radius: 1rem;
+  padding: 0.55rem 0.92rem;
+  background: linear-gradient(180deg, #fff 0%, #ffdbef 98%);
+  box-shadow: 6px 6px 0 var(--lime);
+}
+
+button.sim:active {
+  transform: translate(2px, 2px);
+  box-shadow: 3px 3px 0 var(--lime);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.card {
+  padding: 1rem 1rem 0.95rem;
+  border-radius: 1rem;
+  border: 0.55rem solid var(--ink);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 8px 10px 0 rgba(26, 7, 51, 0.25);
+}
+
+.card.good {
+  background: rgba(218, 255, 207, 0.95);
+  border-color: #1c6b00;
+}
+
+.card.ok {
+  background: rgba(255, 246, 200, 0.98);
+}
+
+.card.help {
+  background: rgba(255, 220, 239, 0.98);
+  border-color: #b1004b;
+}
+
+.card-head {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-bottom: 0.52rem;
+}
+
+.emoji {
+  font-size: clamp(2.1rem, 6vw, 2.6rem);
+  line-height: 1;
+}
+
+.device-name {
+  margin: 0;
+  font-size: 1.23rem;
+  font-weight: 900;
+  line-height: 1.06;
+}
+
+.badge-row {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.badge {
+  font-weight: 900;
+  border: 0.28rem solid var(--ink);
+  border-radius: 0.62rem;
+  padding: 0.12rem 0.52rem;
+  font-size: 0.94rem;
+  background: #fff;
+}
+
+.badge.lan {
+  background: var(--sky);
+}
+
+.badge.wlan {
+  background: var(--lime);
+}
+
+.meter {
+  margin: 0.55rem 0 0.15rem;
+  font-weight: 900;
+}
+
+.bar-track {
+  width: 100%;
+  border: 0.41rem solid var(--ink);
+  border-radius: 999px;
+  height: 1.43rem;
+  background: repeating-linear-gradient(
+    -45deg,
+    #fff,
+    #fff 10px,
+    #eee 10px,
+    #eee 20px
+  );
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  transition: width 0.5s cubic-bezier(0.22, 0.94, 0.35, 1);
+}
+
+.facts {
+  list-style: none;
+  margin: 0.55rem 0 0;
+  padding: 0;
+}
+
+.facts li {
+  margin: 0.2rem 0;
+  padding: 0.28rem 0.52rem;
+  border-radius: 0.72rem;
+  border: 0.31rem dashed rgba(26, 7, 51, 0.35);
+  font-weight: 800;
+}
+
+.status-line {
+  margin-top: 0.72rem;
+  font-size: 1.18rem;
+  font-weight: 900;
+  text-align: center;
+  letter-spacing: 0.015em;
+}
+
+.footer {
+  text-align: center;
+  margin-top: 2rem;
+  font-weight: 800;
+}
+
+.code {
+  display: inline-block;
+  padding: 0.2rem 0.45rem;
+  border-radius: 0.4rem;
+  border: 0.29rem solid var(--ink);
+  background: #fff;
+}

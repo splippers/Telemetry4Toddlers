@@ -1,0 +1,6 @@
+node_modules/
+dist/
+.DS_Store
+
+# Local rolling log — do not ship
+TRANSCRIPT.md
