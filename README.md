@@ -57,7 +57,7 @@ The API (`server/lanScan.mjs`) gathers:
 
 SNMP uses read-only credentials you supply (classic “community strings”). **Do not** ship those to GitHub—keep them in **`server/auth-devices.json`** (copy from **`server/auth-devices.example.json`**) or export **`T4T_AUTH_DEVICES`** JSON before launching the dev stack.
 
-**SNMP agents on fleet:** T4T polls only when a host answers UDP/161 — install **`snmpd` (Linux)** or the Windows SNMP feature per box. Playbook: **[`docs/SNMP_EVERYWHERE.md`](docs/SNMP_EVERYWHERE.md)** · Debian helper: **[`scripts/install-snmp-agent-debian.sh`](scripts/install-snmp-agent-debian.sh)**.
+**SNMP agents on fleet:** T4T polls only when a host answers UDP/161 — install **`snmpd`/`net-snmp` (Linux)** or the Windows SNMP feature per box. Playbook: **[`docs/SNMP_EVERYWHERE.md`](docs/SNMP_EVERYWHERE.md)** · single host: Debian **[`scripts/install-snmp-agent-debian.sh`](scripts/install-snmp-agent-debian.sh)**, RHEL-ish **[`scripts/install-snmp-agent-redhat.sh`](scripts/install-snmp-agent-redhat.sh)** · MARVIN push over SSH to detected LAN neighbours (apt/dnf hosts only): **`scripts/fleet-install-snmp.sh`**.
 
 | Env | Meaning |
 | --- | --- |
