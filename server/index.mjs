@@ -1,58 +1,45 @@
+/**
+ * Standalone LAN API (:8788) — optional when you want HTTP outside Vite
+ * (`npm run dev:split-stack`). Normally `vite` serves /api internally.
+ */
 import http from "node:http";
-import { scanLan } from "./lanScan.mjs";
+import { dispatchApiRoutes, pathnameOnly } from "./httpApi.mjs";
 
 const API_PORT = Number(process.env.T4T_API_PORT || 8788);
-/** `0.0.0.0` = all IPv4 interfaces (home LAN 192.168.1.x + loopback). Use `127.0.0.1` to disable LAN. */
 const API_HOST = process.env.T4T_API_HOST || "0.0.0.0";
 
-function sendJson(res, status, body) {
-  const data = JSON.stringify(body);
-  res.writeHead(status, {
-    "Content-Type": "application/json; charset=utf-8",
-    "Cache-Control": "no-store",
-    "Access-Control-Allow-Origin": "*",
-  });
-  res.end(data);
-}
-
-const server = http.createServer(async (req, res) => {
-  if (req.method === "OPTIONS") {
-    res.writeHead(204, {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET,OPTIONS",
-      "Access-Control-Allow-Headers": "*",
-    });
-    res.end();
+const server = http.createServer((req, res) => {
+  const p = pathnameOnly(req.url || "/");
+  if (!p.startsWith("/api")) {
+    res.statusCode = 404;
+    res.setHeader("Content-Type", "application/json; charset=utf-8");
+    res.end(JSON.stringify({
+      error: "STANDALONE_ROOT",
+      message: "This process only serves /api/* — use npm run dev (Vite) for the UI.",
+    }));
     return;
   }
-
-  const url = new URL(req.url || "/", `http://${req.headers.host || "localhost"}`);
-
-  if (req.method === "GET" && url.pathname === "/api/health") {
-    sendJson(res, 200, { ok: true, pid: process.pid, port: API_PORT });
-    return;
-  }
-
-  if (req.method === "GET" && url.pathname === "/api/devices") {
+  dispatchApiRoutes(req, res, {
+    source: "standalone-tcp",
+    portHint: API_PORT,
+  }).catch((e) => {
     try {
-      const payload = await scanLan();
-      sendJson(res, 200, payload);
-    } catch (e) {
-      sendJson(res, 500, {
-        error: "SCAN_FAILED",
+      res.statusCode = 500;
+      res.setHeader("Content-Type", "application/json; charset=utf-8");
+      res.end(JSON.stringify({
+        error: "FATAL_API",
         message: e instanceof Error ? e.message : String(e),
-      });
+      }));
+    } catch {
+      /* ignore */
     }
-    return;
-  }
-
-  sendJson(res, 404, { error: "NOT_FOUND" });
+  });
 });
 
 server.listen(API_PORT, API_HOST, () => {
   const url = `http://${API_HOST === "0.0.0.0" ? "0.0.0.0" : API_HOST}:${API_PORT}`;
   // eslint-disable-next-line no-console
   console.error(
-    `[t4t-api] listening on ${url} ( reachable on LAN + localhost; set T4T_API_HOST=127.0.0.1 to lock down )`,
+    `[t4t-api] standalone tcp ${url} (optional — Vite normally embeds /api instead)`,
   );
 });

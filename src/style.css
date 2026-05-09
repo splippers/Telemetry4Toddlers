@@ -87,6 +87,46 @@ h1.title {
   background: var(--sun);
 }
 
+.level-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  margin: 0 auto 1rem;
+  max-width: 44rem;
+  padding: 0.52rem 0.72rem;
+  border: 0.43rem solid var(--ink);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 5px 5px 0 var(--pink);
+}
+
+.level-strip label {
+  font-weight: 900;
+  font-size: 0.98rem;
+}
+
+.level-strip select.t4t-level {
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 0.96rem;
+  padding: 0.35rem 0.72rem;
+  border: 0.34rem solid var(--ink);
+  border-radius: 0.72rem;
+  background: linear-gradient(180deg, #fff 0%, #e8fff0 98%);
+}
+
+.level-strip .geek-hint {
+  flex: 1 1 14rem;
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 800;
+  text-align: center;
+  opacity: 0.92;
+}
+
 .controls {
   display: flex;
   flex-wrap: wrap;
@@ -281,4 +321,336 @@ button.sim:active {
   background: rgba(255, 255, 255, 0.95);
   font-weight: 800;
   overflow: auto;
+}
+
+/* ---- Per-audience skins (`data-t4t-level` on `<html>` + `.page`) ---- */
+
+html[data-t4t-level="tot"] {
+  font-size: 19px;
+}
+
+html[data-t4t-level="tot"] .kicker {
+  display: none;
+}
+
+html[data-t4t-level="tot"] .geek-hint {
+  display: none;
+}
+
+html[data-t4t-level="tot"] .banner {
+  transform: none;
+  border-style: solid;
+  border-width: 0.4rem;
+  box-shadow: 6px 6px 0 var(--pink);
+}
+
+html[data-t4t-level="tot"] .sim {
+  font-size: 1.12rem;
+  padding: 0.75rem 1.2rem;
+}
+
+html[data-t4t-level="tot"] .legend {
+  margin-top: 0.75rem;
+}
+
+html[data-t4t-level="tot"] .footer {
+  font-size: 1.05rem;
+  max-width: 32rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.tot-vibe {
+  margin: 0.35rem 0 0.15rem;
+  font-weight: 900;
+  font-size: 1.15rem;
+  text-align: center;
+}
+
+.bar-track--big {
+  height: 1.95rem;
+  border-radius: 1rem;
+}
+
+.facts--micro li {
+  border-style: solid;
+  text-align: center;
+  font-size: 1.05rem;
+}
+
+.card-head--simple {
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  gap: 0.35rem;
+}
+
+.card-head--simple .emoji {
+  font-size: clamp(2.5rem, 9vw, 3.25rem);
+}
+
+html[data-t4t-level="tween"] .card {
+  padding: 0.92rem 0.92rem 0.88rem;
+}
+
+html[data-t4t-level="tween"] .facts li {
+  font-size: 0.93rem;
+  padding: 0.22rem 0.45rem;
+}
+
+html[data-t4t-level="teen"] body {
+  font-size: 17px;
+}
+
+html[data-t4t-level="teen"] .banner-adj-status {
+  font-family: ui-monospace, "Cascadia Code", "IBM Plex Mono", monospace;
+  font-size: 0.92rem;
+  letter-spacing: 0.02em;
+}
+
+html[data-t4t-level="tech-titan"] {
+  font-size: 15px;
+}
+
+html[data-t4t-level="tech-titan"] body {
+  font-family: ui-monospace, "Cascadia Code", "IBM Plex Mono", monospace;
+}
+
+html[data-t4t-level="tech-titan"] .banner,
+html[data-t4t-level="tech-titan"] h1.title,
+html[data-t4t-level="tech-titan"] .kicker,
+html[data-t4t-level="tech-titan"] button.sim,
+html[data-t4t-level="tech-titan"] select.t4t-level,
+html[data-t4t-level="tech-titan"] .level-strip label {
+  font-family: "Comic Sans MS", "Comic Sans", "Chalkboard SE", "Trebuchet MS",
+    sans-serif;
+}
+
+html[data-t4t-level="tech-titan"] .grid {
+  grid-template-columns: repeat(auto-fit, minmax(216px, 1fr));
+  gap: 0.72rem;
+}
+
+html[data-t4t-level="tech-titan"] .facts li,
+html[data-t4t-level="tech-titan"] .badge {
+  font-size: 0.82rem;
+}
+
+html[data-t4t-level="tech-titan"] .banner-adj-status {
+  max-width: 58rem;
+  font-family: inherit;
+}
+
+.card-metrics {
+  display: grid;
+  grid-template-columns: minmax(0, 9.2rem) 1fr;
+  gap: 0.28rem 0.55rem;
+  margin: 0.55rem 0 0;
+  padding: 0.42rem 0.52rem;
+  border-radius: 0.55rem;
+  border: 0.28rem solid rgba(26, 7, 51, 0.45);
+  background: rgba(255, 255, 255, 0.55);
+  font-size: 0.88rem;
+}
+
+.metric-k {
+  font-weight: 800;
+  color: rgba(26, 7, 51, 0.72);
+  font-family: ui-monospace, "Cascadia Code", monospace;
+}
+
+.metric-v {
+  font-weight: 800;
+  font-family: ui-monospace, "Cascadia Code", monospace;
+}
+
+.tier-tag {
+  text-transform: uppercase;
+}
+
+.btn-ghost {
+  cursor: pointer;
+  margin: 0.35rem 0;
+  padding: 0.25rem 0.62rem;
+  font-family: inherit;
+  font-weight: 900;
+  font-size: 0.78rem;
+  border: 0.26rem solid var(--ink);
+  border-radius: 0.55rem;
+  background: rgba(108, 255, 74, 0.35);
+}
+
+.raw-inspect {
+  margin-top: 0.55rem;
+  border-radius: 0.55rem;
+  border: 0.31rem dashed rgba(26, 7, 51, 0.4);
+  padding: 0.35rem 0.52rem;
+  background: rgba(255, 255, 255, 0.65);
+}
+
+.raw-inspect summary {
+  cursor: pointer;
+  font-weight: 900;
+  font-family: ui-monospace, monospace;
+  font-size: 0.78rem;
+  list-style-position: outside;
+}
+
+.raw-json {
+  margin: 0.45rem 0 0;
+  padding: 0.45rem;
+  max-height: 14rem;
+  overflow: auto;
+  font-size: 0.68rem;
+  line-height: 1.35;
+  border: 0.26rem solid var(--ink);
+  background: rgba(26, 7, 51, 0.06);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.probe-hud {
+  max-width: 58rem;
+  margin: 0.65rem auto 0;
+  padding: 0.55rem 0.72rem;
+  border: 0.43rem solid var(--ink);
+  border-radius: 0.72rem;
+  background: repeating-linear-gradient(
+      -52deg,
+      rgba(255, 255, 255, 0.92),
+      rgba(255, 255, 255, 0.92) 12px,
+      rgba(236, 255, 220, 0.95) 12px,
+      rgba(236, 255, 220, 0.95) 24px
+    ),
+    rgba(255, 255, 255, 0.9);
+  box-shadow: 5px 5px 0 var(--grape);
+}
+
+.probe-hud[hidden] {
+  display: none !important;
+}
+
+.probe-hud-title {
+  margin: 0 0 0.4rem;
+  font-weight: 900;
+  font-size: 0.82rem;
+  letter-spacing: 0.12em;
+  font-family: ui-monospace, "Cascadia Code", monospace;
+}
+
+.probe-hud-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.38rem;
+}
+
+.probe-hud-row {
+  display: grid;
+  grid-template-columns: minmax(7.5rem, 10rem) minmax(0, 1fr);
+  gap: 0.45rem;
+  align-items: baseline;
+  font-size: 0.85rem;
+}
+
+.probe-hud-k {
+  font-weight: 900;
+  font-family: ui-monospace, "Cascadia Code", monospace;
+  color: rgba(26, 7, 51, 0.55);
+}
+
+.probe-hud-val {
+  font-weight: 900;
+  font-family: ui-monospace, "Cascadia Code", monospace;
+}
+
+.probe-hud-val--wrap {
+  word-break: break-all;
+}
+
+.probe-hud-row--fetch {
+  display: none;
+}
+
+html[data-t4t-level="teen"] .probe-hud-row--fetch,
+html[data-t4t-level="tech-titan"] .probe-hud-row--fetch {
+  display: grid;
+}
+
+.probe-hud-row--clock {
+  display: none;
+}
+
+html[data-t4t-level="tech-titan"] .probe-hud-row--clock {
+  display: grid;
+}
+
+.footer-warm {
+  max-width: 36rem;
+  margin: 0 auto 1rem;
+  padding: 0 0.5rem;
+  line-height: 1.42;
+}
+
+.footer-warm--tight {
+  margin-bottom: 0.55rem;
+}
+
+.footer-tool,
+.footer-tool--curl,
+.footer-tool--dense {
+  margin: 0.55rem auto 0;
+  max-width: 44rem;
+  font-size: 0.94rem;
+  line-height: 1.48;
+}
+
+.footer-tool--dense {
+  font-family: ui-monospace, "Cascadia Code", monospace;
+  font-size: 0.84rem;
+}
+
+.footer-tool-stack {
+  margin-top: 0.75rem;
+}
+
+.env-matrix {
+  width: 100%;
+  max-width: 52rem;
+  margin: 0.5rem auto 0;
+  border-collapse: collapse;
+  border: 0.35rem solid var(--ink);
+  background: rgba(255, 255, 255, 0.95);
+  font-size: 0.82rem;
+}
+
+.env-matrix caption {
+  caption-side: top;
+  text-align: left;
+  padding: 0.35rem 0.35rem 0.5rem;
+  font-weight: 900;
+}
+
+.env-matrix th,
+.env-matrix td {
+  border-bottom: 0.2rem dashed rgba(26, 7, 51, 0.25);
+  padding: 0.35rem 0.45rem;
+  vertical-align: top;
+}
+
+.env-matrix th {
+  font-family: ui-monospace, "Cascadia Code", monospace;
+  font-weight: 900;
+  text-align: left;
+  width: 11rem;
+  background: rgba(92, 225, 255, 0.22);
+}
+
+html[data-t4t-level="tech-titan"] .footer.footer--envGrid {
+  text-align: left;
+  font-family: ui-monospace, "Cascadia Code", monospace;
+}
+
+html[data-t4t-level="tech-titan"] .footer.footer--envGrid caption,
+html[data-t4t-level="tech-titan"] .footer.footer--envGrid .footer-warm {
+  font-family: "Comic Sans MS", "Comic Sans", "Chalkboard SE", sans-serif;
 }

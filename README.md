@@ -62,27 +62,26 @@ SNMP uses read-only credentials you supply (classic “community strings”). **
 | **`T4T_LAN_IFACE`** | NIC name (`enp2s0`, …) if MARVIN can’t infer the default route |
 | **`T4T_AUTH_FILE`** | Alternate JSON path describing SNMP secrets |
 | **`T4T_AUTH_DEVICES`** | Inline JSON overriding the secrets file |
-| **`T4T_API_HOST`** | Default **`0.0.0.0`** — listen on **all IPv4 NICs** (your **192.168.1.x** LAN plus loopback). Set **`127.0.0.1`** if you refuse LAN-direct API hits. |
-| **`T4T_API_PORT`** | Port (default **8788**) |
+| **`T4T_API_HOST`** | **Standalone** `npm run dev:api` only — bind address (default **`0.0.0.0`**, or **`127.0.0.1`** to lock LAN out). |
+| **`T4T_API_PORT`** | **Standalone** scout TCP port (default **8788**). **Ignored** while using `npm run dev` / `vite preview` — those embed `/api`. |
 
-**Vite** (`npm run dev` / `preview:live`) still proxies **`/api/*` → `http://127.0.0.1:8788`** from MARVIN, so tablets can use **`http://<MARVIN-LAN-IP>:5173`** only. With **`T4T_API_HOST=0.0.0.0`**, you *may* also call **`http://<MARVIN-LAN-IP>:8788/api/...`** directly (same subnet).
+**Embedded mode (default):** `npm run dev` and `npm run preview` run a Vite plugin (`server/vitePluginApi.mjs`) that answers **`GET /api/*` in-process**, so DAD can load **`http://marvin:5173/`** and `fetch("/api/devices")` succeeds with **no proxy** and **no second terminal**.
 
-### Production-ish preview caveat
+**Standalone mode (optional):** `node server/index.mjs` (see **`npm run dev:api`**) still exposes **`http://<MARVIN-LAN-IP>:8788/api/...`** when you want systemd / split processes.
 
-**`npm run preview`** serves static **`dist/`** only—`/api` is missing unless you launch the LAN scout separately.
+### Preview / static notes
 
-Use **`npm run preview:live`** for one command that runs **`vite preview` + `server/index.mjs`** (API on **`0.0.0.0:8788`** by default + Vite **`/api` proxy)**.
+**`npm run build && npm run preview`** now keeps the LAN scout **embedded** in the preview server as well (typically **port 4173** — read the terminal footer). **`preview:live`** is an alias identical to **`preview`**.
 
 ## Develop
 
 ```bash
 npm install
-npm run dev        # Vite (0.0.0.0:5173) + API (0.0.0.0:8788) via concurrently
-npm run dev:ui     # UI only (mock /api errors unless you also run dev:api)
-npm run dev:api    # API only
-npm run build      # static artefacts in dist/
-npm run preview         # UI only from dist/
-npm run preview:live    # UI + LAN API together (recommended for demos)
+npm run dev            # Vite :5173 + embedded /api
+npm run dev:api        # optional: standalone TCP scout (T4T_API_PORT / T4T_API_HOST)
+npm run build          # dist/
+npm run preview        # dist/ + embedded /api (port from terminal, often 4173)
+npm run preview:live   # same as preview (kept for muscle memory)
 ```
 
 **Vite host check:** the UI allows **`Host: marvin`** (and **`localhost`**). Add more names with comma-separated **`VITE_ALLOWED_HOSTS`** (e.g. `export VITE_ALLOWED_HOSTS=marvin,mybox` before `npm run dev`).

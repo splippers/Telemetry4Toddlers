@@ -1,4 +1,5 @@
 import { defineConfig } from "vite";
+import { t4tViteApiPlugin } from "./server/vitePluginApi.mjs";
 
 const allowedHosts = [
   ...new Set([
@@ -14,24 +15,13 @@ const allowedHosts = [
 export default defineConfig({
   root: ".",
   appType: "spa",
+  plugins: [t4tViteApiPlugin()],
   server: {
     host: "0.0.0.0",
     allowedHosts,
-    proxy: {
-      "/api": {
-        target: "http://127.0.0.1:8788",
-        changeOrigin: true,
-      },
-    },
   },
   preview: {
     host: "0.0.0.0",
     allowedHosts,
-    proxy: {
-      "/api": {
-        target: "http://127.0.0.1:8788",
-        changeOrigin: true,
-      },
-    },
   },
 });
