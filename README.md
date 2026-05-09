@@ -85,6 +85,8 @@ npm run preview         # UI only from dist/
 npm run preview:live    # UI + LAN API together (recommended for demos)
 ```
 
+**Vite host check:** the UI allows **`Host: marvin`** (and **`localhost`**). Add more names with comma-separated **`VITE_ALLOWED_HOSTS`** (e.g. `export VITE_ALLOWED_HOSTS=marvin,mybox` before `npm run dev`).
+
 ## Philosophy
 
 Telemetry is spooky when jargon hides behind glass. Keep the scary words **in prose adults skim**, ship an interface honouring attention spans measured in raisins, and badges stay earned—with glitter.
