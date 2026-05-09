@@ -68,7 +68,9 @@ The API stays localhost-only while **Vite proxies `/api/*`** during `npm run dev
 
 ### Production-ish preview caveat
 
-**`npm run preview`** serves static UI only—start **`npm run dev:api`** in another shell (or reuse `npm run dev`) so `/api` keeps working.
+**`npm run preview`** serves static **`dist/`** only—`/api` is missing unless you launch the LAN scout separately.
+
+Use **`npm run preview:live`** for one command that runs **`vite preview` + `server/index.mjs`** (same **`127.0.0.1:8788`** API + Vite **`/api` proxy)**.
 
 ## Develop
 
@@ -78,7 +80,8 @@ npm run dev        # Vite (0.0.0.0:5173) + LAN API (127.0.0.1:8788) via concurre
 npm run dev:ui     # UI only (mock /api errors unless you also run dev:api)
 npm run dev:api    # API only
 npm run build      # static artefacts in dist/
-npm run preview    # static UI; pair with dev:api for live data
+npm run preview         # UI only from dist/
+npm run preview:live    # UI + LAN API together (recommended for demos)
 ```
 
 ## Philosophy
