@@ -4,3 +4,6 @@ dist/
 
 # Local rolling log — do not ship
 TRANSCRIPT.md
+
+# SNMP / device auth (copy from auth-devices.example.json)
+server/auth-devices.json

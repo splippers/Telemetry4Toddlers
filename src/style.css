@@ -242,3 +242,43 @@ button.sim:active {
   border: 0.29rem solid var(--ink);
   background: #fff;
 }
+
+.grid > div {
+  display: contents;
+}
+
+.banner-adj-status {
+  text-align: center;
+  margin: 0.6rem auto 0;
+  max-width: 44rem;
+  font-weight: 900;
+  padding: 0.45rem 0.7rem;
+  border: 0.4rem solid var(--ink);
+  background: rgba(255, 255, 255, 0.9);
+  transform: rotate(0.55deg);
+}
+
+.badge.auth-yes {
+  background: var(--lime);
+}
+
+.badge.auth-no {
+  background: #ffe0f3;
+}
+
+.card.auth {
+  outline: 0.45rem dashed #1c6b00;
+}
+
+.card.simple {
+  filter: saturate(0.95);
+}
+
+.code-block {
+  margin: 0.6rem 0 0;
+  padding: 0.75rem;
+  border: 0.4rem solid var(--ink);
+  background: rgba(255, 255, 255, 0.95);
+  font-weight: 800;
+  overflow: auto;
+}

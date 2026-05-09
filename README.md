@@ -2,7 +2,7 @@
 
 **Kid-scale network health:** loud colours, **Comic Sans**, and words a **Primary School Trainee Tech** can shout across the playground.
 
-This repo is the **splashy front-of-house**. Real pings, SNMP, DHCP leases, RSSI dumps, ARP pals, traceroute giggles—the plumbing—can bolt on later. Right now `npm run dev` shows pretend devices so trainees learn the **traffic-light story** without fear.
+This repo ships a **really-for-real-but-still-cartoony MARVIN-facing dashboard**: the UI reads **`/api/devices`**, powered by MARVIN’s Linux **IPv4 neighbour table** (`ip neigh`) plus **ICMP ping** probes. Optionally add **SNMPv2 read-only credentials** only for IPs you deliberately trust—the UI shows **EXTRA SPY GLASSES** badges for hosts that authenticate.
 
 ## Who is this for?
 
@@ -36,21 +36,49 @@ Adults see columns in Grafana; kiddos see cartoon meters:
 | Amber | “meh yoghurt” | Maybe tighten antennas or ask a mentor |
 | Red | sirens-but-safe | Escalate to a Mentor Tech badge holder |
 
-The **pretend internet weather** button lets classes rehearse triage etiquette without blasting real infra.
+The **BIG RE-SCAN** button politely re-queries the LAN (still Comic Sans fireworks).
 
 ### Future homework (engineering)
 
-1. Probe workers emitting JSON snapshots (ICMP, jitter, SNMP nuggets, WLAN controller crumbs—secrets live in vaults guardians approve).
+1. Extend probes (SNMP walks beyond `sys*` OIDs, interface counters, jitter, WPA controller APIs—after grown-up risk review).
 2. WebSocket carnival board for wall displays (still Comic Sans).
 3. **Mentor Mode** flipping to raw graphs while trainees keep the sparkly view.
+
+## LAN scout + trainee privacy notes
+
+### What MARVIN does today
+
+The API (`server/lanScan.mjs`) gathers:
+
+- IPs + MAC addresses + neighbour state from **`ip -4 neigh show dev <iface>`**
+- ICMP RTT (**`ping -c 1 -W 1`**) with capped concurrency bursts
+- Optional reverse DNS PTR via Node’s resolver
+- Optional SNMP `sysName` / `sysUpTime` / `sysDescr` for configured hosts via `server/auth-devices.json` (ignored by Git)
+
+SNMP uses read-only credentials you supply (classic “community strings”). **Do not** ship those to GitHub—keep them in **`server/auth-devices.json`** (copy from **`server/auth-devices.example.json`**) or export **`T4T_AUTH_DEVICES`** JSON before launching the dev stack.
+
+| Env | Meaning |
+| --- | --- |
+| **`T4T_LAN_IFACE`** | NIC name (`enp2s0`, …) if MARVIN can’t infer the default route |
+| **`T4T_AUTH_FILE`** | Alternate JSON path describing SNMP secrets |
+| **`T4T_AUTH_DEVICES`** | Inline JSON overriding the secrets file |
+| **`T4T_API_PORT`** | API binds **`127.0.0.1:$PORT`** (default **8788**) |
+
+The API stays localhost-only while **Vite proxies `/api/*`** during `npm run dev`, so DAD/other LAN browsers talk to **`http://<MARVIN-IP>:5173`** normally.
+
+### Production-ish preview caveat
+
+**`npm run preview`** serves static UI only—start **`npm run dev:api`** in another shell (or reuse `npm run dev`) so `/api` keeps working.
 
 ## Develop
 
 ```bash
 npm install
-npm run dev      # playful dashboard + hot reload
-npm run build    # static artefacts in dist/
-npm run preview  # peek the production-ish build
+npm run dev        # Vite (0.0.0.0:5173) + LAN API (127.0.0.1:8788) via concurrently
+npm run dev:ui     # UI only (mock /api errors unless you also run dev:api)
+npm run dev:api    # API only
+npm run build      # static artefacts in dist/
+npm run preview    # static UI; pair with dev:api for live data
 ```
 
 ## Philosophy

@@ -1,0 +1,10 @@
+[
+  {
+    "ip": "192.168.1.119",
+    "label": "DAD laptop (example)",
+    "snmp": {
+      "community": "PUT_READ_COMMUNITY_HERE",
+      "note": "Only devices with matching ip + snmp.community get the fancy badge stats."
+    }
+  }
+]

@@ -1,74 +1,6 @@
 import "./style.css";
 
-/** @typedef {"LAN" | "WLAN"} NicKind */
-
-/** Mock devices — trainee-friendly names; someday these come from real probes/API. */
-function baseDevices() {
-  return [
-    {
-      emoji: "🧸",
-      name: "Hallway Wi-Fi Wizard",
-      kind: /** @type {NicKind} */ ("WLAN"),
-      speedAnswerMs: 9,
-      lostMessagesPct: 0,
-      rainbowSignalPct: 94,
-      message: "SUPER GREEN: Your wizard is humming a happy tune!",
-      tier: /** @type {"good"|"ok"|"help"} */ ("good"),
-    },
-    {
-      emoji: "🦄",
-      name: "Mum's Zoom Rocket",
-      kind: /** @type {NicKind} */ ("WLAN"),
-      speedAnswerMs: 54,
-      lostMessagesPct: 1,
-      rainbowSignalPct: 72,
-      message: "OKAY ORANGE: A grown-up helper could tighten this up.",
-      tier: /** @type {"good"|"ok"|"help"} */ ("ok"),
-    },
-    {
-      emoji: "🦖",
-      name: "DAD Number Crunch Cave",
-      kind: /** @type {NicKind} */ ("LAN"),
-      speedAnswerMs: 4,
-      lostMessagesPct: 0,
-      rainbowSignalPct: 100,
-      message: "WOO: LAN dinosaurs are SPEEDY dinosaurs!",
-      tier: /** @type {"good"|"ok"|"help"} */ ("good"),
-    },
-    {
-      emoji: "🎨",
-      name: "Classroom Tablets Cart",
-      kind: /** @type {NicKind} */ ("WLAN"),
-      speedAnswerMs: 220,
-      lostMessagesPct: 6,
-      rainbowSignalPct: 38,
-      message: "RED ALERT TEAM: Gather the Trainee Badge Leader!",
-      tier: /** @type {"good"|"ok"|"help"} */ ("help"),
-    },
-    {
-      emoji: "🥤",
-      name: "Snack Fridge (yes it has Wi-Fi)",
-      kind: /** @type {NicKind} */ ("WLAN"),
-      speedAnswerMs: 120,
-      lostMessagesPct: 3,
-      rainbowSignalPct: 55,
-      message: "MEH YELLOW: The fridge is sleepy but still cold.",
-      tier: /** @type {"good"|"ok"|"help"} */ ("ok"),
-    },
-    {
-      emoji: "🚌",
-      name: "Field Trip Mystery Camera",
-      kind: /** @type {NicKind} */ ("WLAN"),
-      speedAnswerMs: 980,
-      lostMessagesPct: 18,
-      rainbowSignalPct: 12,
-      message: "ULTRA WOBBLY… maybe it went on vacation without telling us?",
-      tier: /** @type {"good"|"ok"|"help"} */ ("help"),
-    },
-  ];
-}
-
-/** @returns { HTMLElement } */
+/** @returns {HTMLElement} */
 function el(tag, props = {}, kids = []) {
   const node = document.createElement(tag);
   Object.assign(node, props);
@@ -76,6 +8,28 @@ function el(tag, props = {}, kids = []) {
     node.append(k);
   }
   return node;
+}
+
+/** @returns {"good"|"ok"|"help"} */
+function deriveTier(ms, neighState, authed) {
+  const alive = neighState === "REACHABLE" || neighState === "STALE" || authed;
+  if (!alive && ms == null) return "help";
+  if (ms == null) return "ok";
+  if (ms < 35) return "good";
+  if (ms < 160) return "ok";
+  return "help";
+}
+
+function signalPctFromPing(ms) {
+  if (ms == null) return 15;
+  return Math.round(Math.max(10, Math.min(100, 118 - ms * 0.55)));
+}
+
+/** @returns {"lime-fill"|"sun-fill"|"panic-fill"} */
+function signalFillClass(tier) {
+  if (tier === "good") return "lime-fill";
+  if (tier === "ok") return "sun-fill";
+  return "panic-fill";
 }
 
 /** @returns {HTMLElement} */
@@ -89,91 +43,100 @@ function barFill(pct, fillClass) {
   return fill;
 }
 
-/** @returns {HTMLElement} */
-function signalFillClass(tier) {
-  if (tier === "good") return "lime-fill";
-  if (tier === "ok") return "sun-fill";
-  return "panic-fill";
-}
+/** Card UI for LAN rows coming from MARVIN's neighbour table +SNMP. */
+function renderLanCards(devices) {
+  /** @param {Record<string, unknown>} d Raw row from API */
+  function row(d) {
+    const pingMs =
+      typeof d.pingMs === "number"
+        ? d.pingMs
+        : d.pingMs == null
+          ? null
+          : Number(d.pingMs);
+    const authed = Boolean(d.authed);
+    const neighState = String(d.neighState || "UNKNOWN");
+    const tier =
+      d.tier === "good" || d.tier === "ok" || d.tier === "help"
+        ? d.tier
+        : deriveTier(pingMs, neighState, authed);
+    const barClass = signalFillClass(tier);
+    const signal = signalPctFromPing(pingMs);
+    const pingLabel =
+      typeof d.pingLabel === "string" ? d.pingLabel : pingMs == null ? "NO PING ANSWER" : `${pingMs} ms`;
 
-function jitterDevices(devices, seed) {
-  const copy = structuredClone(devices);
-  let rng = seed;
-  const rnd = () => {
-    rng = (rng * 1664525 + 1013904223) >>> 0;
-    return rng / 4294967296;
-  };
-  for (const d of copy) {
-    const wobble = rnd() * 16 - 8;
-    d.speedAnswerMs = Math.max(3, Math.round(d.speedAnswerMs + wobble));
-    d.rainbowSignalPct = Math.min(
-      100,
-      Math.max(0, Math.round(d.rainbowSignalPct + rnd() * 10 - 5)),
-    );
-    d.lostMessagesPct = Math.min(
-      25,
-      Math.max(0, +(d.lostMessagesPct + rnd() * 2 - 1).toFixed(1)),
-    );
-    const happy = rnd();
-    if (happy > 0.78) {
-      d.tier = "good";
-      d.message = "RNG says: sparkly day!";
+    const name = String(d.name || d.ip || "Mystery pal");
+    const emoji = String(d.emoji || "🔌");
+    const ip = String(d.ip || "");
+    const mac = String(d.mac || "UNKNOWN NAMETAG");
+
+    const badgeAuthed = el("span", {
+      className: `badge ${authed ? "auth-yes" : "auth-no"}`,
+      textContent: authed ? "SECRET HANDSHAKE: YES" : "SECRET HANDSHAKE: NOPE",
+    });
+
+    const kindBadge = el("span", {
+      className: "badge lan",
+      textContent: "LAN NEIGHBOUR",
+    });
+
+    const snmp = d.snmp && typeof d.snmp === "object" ? d.snmp : null;
+
+    const facts = [
+      el("li", { textContent: `HOUSE ADDRESS (IP): ${ip}` }),
+      el("li", { textContent: `HARDWARE NAMETAG (MAC): ${mac}` }),
+      el("li", { textContent: `HOW FAST DID IT ANSWER? ${pingLabel}` }),
+      el("li", { textContent: `NEIGHBOUR MOOD: ${neighState}` }),
+    ];
+
+    if (authed && snmp) {
+      const up = /** @type {any} */ (snmp).uptimeHuman;
+      const descr = /** @type {any} */ (snmp).sysDescr;
+      if (up) facts.push(el("li", { textContent: `UPTIME STICKER: ${up}` }));
+      if (descr) facts.push(el("li", { textContent: `SYS DESCR (tiny): ${String(descr).slice(0, 160)}` }));
+    } else {
+      facts.push(
+        el("li", {
+          textContent: "NO SUPER STATS — add server/auth-devices.json with SNMP read string for this IP.",
+        }),
+      );
     }
-  }
-  return copy;
-}
 
-function renderDevices(devices) {
-  /** @returns {HTMLElement} */
-  function card(device) {
-    const speedAnswer = `${device.speedAnswerMs} milliseconds`;
-    const lost = `${device.lostMessagesPct}%`;
-    const signal = `${device.rainbowSignalPct}%`;
-    const barClass = signalFillClass(device.tier);
+    const cardClass = `card ${tier} ${authed ? "auth" : "simple"}`;
 
     return el(
       "article",
       {
-        className: `card ${device.tier}`,
+        className: cardClass,
       },
       [
         el("div", { className: "card-head" }, [
           el("div", {
             className: "emoji",
-            textContent: device.emoji,
+            textContent: emoji,
             ariaHidden: true,
           }),
           el("div", {}, [
-            el("h2", { className: "device-name", textContent: device.name }),
-            el("div", { className: "badge-row" }, [
-              el("span", { className: `badge ${device.kind === "LAN" ? "lan" : "wlan"}`, textContent: device.kind }),
-            ]),
+            el("h2", { className: "device-name", textContent: name }),
+            el("div", { className: "badge-row" }, [kindBadge, badgeAuthed]),
           ]),
         ]),
-        el("p", { className: "meter", textContent: "RAINBOW WI-FI / WIRE POWERS LEVEL" }),
-        el("div", { className: "bar-track" }, [barFill(device.rainbowSignalPct, barClass)]),
-        el(
-          "ul",
-          { className: "facts" },
-          [
-            el("li", { textContent: `HOW FAST DID IT ANSWER? ${speedAnswer}` }),
-            el("li", { textContent: `LOST MESSAGES: ${lost} (Lower is yum-yum snacks)` }),
-            el("li", { textContent: `SIGNAL SCOREBOARD: ${signal}` }),
-          ],
-        ),
+        el("p", {
+          className: "meter",
+          textContent: authed
+            ? "SUPER-DUPER SNMP RAINBOW STRIP"
+            : "SIMPLE FRIENDSHIP SIGNAL (no secret handshake)",
+        }),
+        el("div", { className: "bar-track" }, [barFill(signal, barClass)]),
+        el("ul", { className: "facts" }, facts),
         el("p", {
           className: "status-line",
-          textContent: device.message,
+          textContent: String(d.message || ""),
         }),
       ],
     );
   }
 
-  return el(
-    "div",
-    {},
-    devices.map(card),
-  );
+  return el("div", {}, devices.map(row));
 }
 
 function hero() {
@@ -183,7 +146,7 @@ function hero() {
     [
       el("p", {
         className: "kicker",
-        textContent: "PRIMARY SCHOOL — TRAINEE TECH CREW BADGE PATCH v0.1",
+        textContent: "PRIMARY SCHOOL — TRAINEE TECH CREW BADGE PATCH v0.2 (REAL LAN NEIGHBOURS)",
       }),
       el("h1", {
         className: "title",
@@ -192,7 +155,7 @@ function hero() {
       el("p", {
         className: "sub",
         textContent:
-          "Big colours, chunky words, and Comic Sans so even the teddy bear router smiles. GREEN = cheers, RED = STOP and summon a Mentor Tech.",
+          "Green cards are happy pings, red cards need a Mentor Tech. Secret-handshake pals show BIG SNMP stickers (if you trust them with a read-only password).",
       }),
     ],
   );
@@ -202,27 +165,23 @@ function legend() {
   return el("div", { className: "legend" }, [
     el("span", {
       className: "pill",
-      textContent: "LAN pals = RAINBOW BLUE WIRE NAMES",
+      textContent: "LAN neighbours = rainbow cards from MARVIN’s kernel pals list",
     }),
     el("span", {
       className: "pill warn",
-      textContent: "WLAN pals = LIME GREEN WAVE NAMES",
-    }),
-    el("span", {
-      className: "pill",
-      textContent: 'No scary acronyms on the kiddo screen (except „LAN“ „WLAN“ badges)',
+      textContent: "SECRET HANDSHAKE = SNMP read-string you placed in auth-devices.json",
     }),
   ]);
 }
 
-function controls(onSimulate) {
+function controls(onRefresh) {
   const btn = el("button", {
     type: "button",
     className: "sim",
-    textContent: "Press for pretend internet weather",
-    onclick: () => onSimulate(),
+    textContent: "Press to RE-SCAN the classroom LAN!",
+    onclick: () => onRefresh(),
   });
-  return el("div", { className: "controls", role: "group", ariaLabel: "Play controls" }, [btn]);
+  return el("div", { className: "controls", role: "group", ariaLabel: "LAN controls" }, [btn]);
 }
 
 function paintExtraBarStyles() {
@@ -235,39 +194,93 @@ function paintExtraBarStyles() {
   document.head.append(sheet);
 }
 
-function mount(root) {
+async function fetchDevices() {
+  const res = await fetch("/api/devices", { headers: { Accept: "application/json" } });
+  if (!res.ok) throw new Error(`Scanner said HTTP ${res.status}`);
+  const json = await res.json();
+  if (json.error === "SCAN_FAILED") throw new Error(json.message || "scan failed");
+  return json;
+}
+
+function footerNote() {
+  return el(
+    "footer",
+    { className: "footer" },
+    [
+      el("p", {}, [
+        "Run ",
+        el("span", {
+          className: "code",
+          textContent: "npm run dev",
+        }),
+        " on MARVIN so the sparkly UI (5173) and the shy LAN scanner API (8788) wake up together. Copy ",
+        el("span", { className: "code", textContent: "server/auth-devices.example.json" }),
+        " → ",
+        el("span", { className: "code", textContent: "server/auth-devices.json" }),
+        " for SNMP pals.",
+      ]),
+    ],
+  );
+}
+
+async function mount(root) {
   paintExtraBarStyles();
   root.className = "page";
-  let devices = baseDevices();
 
-  const gridWrap = el("section", {});
-  gridWrap.append(renderDevices(devices));
+  const statusBar = el("p", {
+    className: "banner-adj-status",
+    textContent: "Waking up trainee radar…",
+  });
+
+  const gridWrap = el("section", { className: "grid" });
+  gridWrap.append(el("p", { className: "status-line", textContent: "…loading LAN neighbours…" }));
+
+  async function refresh() {
+    statusBar.textContent = "Sweeping MARVIN’s LAN neighbour table + gentle pings…";
+    try {
+      const payload = /** @type {any} */ (await fetchDevices());
+      const iface = typeof payload.iface === "string" ? payload.iface : "?";
+      const devices = Array.isArray(payload.devices) ? payload.devices : [];
+      if (devices.length === 0 && payload.message) {
+        gridWrap.replaceChildren(el("pre", { className: "code-block", textContent: payload.message }));
+        statusBar.textContent = "Scanner grumbled — check T4T_LAN_IFACE / ip neigh.";
+        return;
+      }
+      gridWrap.replaceChildren(renderLanCards(devices));
+      statusBar.textContent =
+        `${devices.length} pal(s) on ${iface}` +
+        (payload.scannedAt ? ` — scan tick at ${payload.scannedAt}` : "");
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      gridWrap.replaceChildren(
+        el("div", { className: "card help" }, [
+          el("h2", { className: "device-name", textContent: "OOPSIE DAISY RADAR OFFLINE" }),
+          el("pre", {
+            className: "code-block",
+            textContent:
+              `${msg}\n\nHint: is "npm run dev" running?\n(API should listen on http://127.0.0.1:8788 and Vite proxies /api`,
+          }),
+        ]),
+      );
+      statusBar.textContent = "Scanner API missing — peek console + terminal!";
+    }
+  }
 
   root.append(
     hero(),
+    statusBar,
     legend(),
-    controls(() => {
-      devices = jitterDevices(baseDevices(), Date.now() % 9973);
-      gridWrap.replaceChildren(renderDevices(devices));
-    }),
+    controls(() => void refresh()),
     gridWrap,
-    el(
-      "footer",
-      { className: "footer" },
-      [
-        el("p", {}, [
-          "Today is PRACTISE DATA. Tomorrow we plug real sensors and routers. Run ",
-          el("span", {
-            className: "code",
-            textContent: "npm run dev",
-          }),
-          " to play locally.",
-        ]),
-      ],
-    ),
+    footerNote(),
   );
+
+  await refresh();
 
   document.body.replaceChildren(root);
 }
 
-mount(document.getElementById("app"));
+mount(document.getElementById("app")).catch(() => {
+  document.getElementById("app").textContent =
+    "Something exploded before Comic Sans loaded — Mentor Tech badge required.";
+});

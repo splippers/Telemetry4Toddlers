@@ -4,11 +4,17 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "concurrently -k -n api,ui -c magenta,cyan \"node server/index.mjs\" \"vite --host 0.0.0.0\"",
+    "dev:ui": "vite --host 0.0.0.0",
+    "dev:api": "node server/index.mjs",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview --host 0.0.0.0"
+  },
+  "dependencies": {
+    "net-snmp": "^3.26.0"
   },
   "devDependencies": {
+    "concurrently": "^9.2.1",
     "vite": "^6.3.5"
   }
 }
