@@ -4,18 +4,19 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently -k -n api,ui -c magenta,cyan \"node server/index.mjs\" \"vite --host 0.0.0.0\"",
+    "dev": "concurrently -k -n api,ui -c magenta,cyan \"node server/index.mjs\" \"wait-on -t 60000 tcp:8788 && vite --host 0.0.0.0\"",
     "dev:ui": "vite --host 0.0.0.0",
     "dev:api": "node server/index.mjs",
     "build": "vite build",
     "preview": "vite preview --host 0.0.0.0",
-    "preview:live": "concurrently -k -n api,ui -c magenta,cyan \"node server/index.mjs\" \"vite preview --host 0.0.0.0\""
+    "preview:live": "concurrently -k -n api,ui -c magenta,cyan \"node server/index.mjs\" \"wait-on -t 60000 tcp:8788 && vite preview --host 0.0.0.0\""
   },
   "dependencies": {
     "net-snmp": "^3.26.0"
   },
   "devDependencies": {
     "concurrently": "^9.2.1",
-    "vite": "^6.3.5"
+    "vite": "^6.3.5",
+    "wait-on": "^9.0.3"
   }
 }

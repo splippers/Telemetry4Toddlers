@@ -194,12 +194,34 @@ function paintExtraBarStyles() {
   document.head.append(sheet);
 }
 
-async function fetchDevices() {
-  const res = await fetch("/api/devices", { headers: { Accept: "application/json" } });
-  if (!res.ok) throw new Error(`Scanner said HTTP ${res.status}`);
-  const json = await res.json();
-  if (json.error === "SCAN_FAILED") throw new Error(json.message || "scan failed");
-  return json;
+async function sleep(ms) {
+  await new Promise((r) => setTimeout(r, ms));
+}
+
+/** Retries tame the race where Vite opens before tcp/8788 is accepting. */
+async function fetchDevices(maxAttempts = 6) {
+  let lastErr;
+  for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+    try {
+      const res = await fetch("/api/devices", {
+        headers: { Accept: "application/json" },
+      });
+      if (!res.ok) {
+        throw new Error(`Scanner said HTTP ${res.status}`);
+      }
+      const json = await res.json();
+      if (json.error === "SCAN_FAILED") {
+        throw new Error(json.message || "scan failed");
+      }
+      return json;
+    } catch (e) {
+      lastErr = e instanceof Error ? e : new Error(String(e));
+      if (attempt < maxAttempts - 1) {
+        await sleep(450 + attempt * 150);
+      }
+    }
+  }
+  throw lastErr ?? new Error("Scanner fetch failed");
 }
 
 function footerNote() {
@@ -257,12 +279,32 @@ async function mount(root) {
           el("h2", { className: "device-name", textContent: "OOPSIE DAISY RADAR OFFLINE" }),
           el("pre", {
             className: "code-block",
-            textContent:
-              `${msg}\n\nHint: is "npm run dev" running?\n(API should listen on http://127.0.0.1:8788 and Vite proxies /api`,
+            textContent: `${msg}
+
+FIX-IT CHEAT SHEET (run on MARVIN in Telemetry4Toddlers/)
+
+  npm install
+  npm run dev
+
+Must see BOTH logs:
+  • [t4t-api] listening on http://127.0.0.1:8788
+  • Vite ➜  Network:  http://192.168.… :5173
+
+Only ran Vite/UI? That hides the scout. Use npm run dev (API+UI).
+
+Health check:
+
+  curl -sS http://127.0.0.1:8788/api/health
+
+Serving dist/?
+
+  npm run build && npm run preview:live
+`,
           }),
         ]),
       );
-      statusBar.textContent = "Scanner API missing — peek console + terminal!";
+      statusBar.textContent =
+        "Scanner API still hiding — MARVIN needs node server/index.mjs (port 8788) + npm run dev or preview:live!";
     }
   }
 
