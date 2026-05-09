@@ -287,14 +287,20 @@ FIX-IT CHEAT SHEET (run on MARVIN in Telemetry4Toddlers/)
   npm run dev
 
 Must see BOTH logs:
-  • [t4t-api] listening on http://127.0.0.1:8788
-  • Vite ➜  Network:  http://192.168.… :5173
+  • [t4t-api] listening on http://0.0.0.0:8788 …
+  • Vite ➜  Network:  http://192.168.… :5173/
 
 Only ran Vite/UI? That hides the scout. Use npm run dev (API+UI).
 
-Health check:
+Health check (loopback):
 
   curl -sS http://127.0.0.1:8788/api/health
+
+Optional direct LAN API (same 192.168.1.x subnet):
+
+  curl -sS http://192.168.1.2:8788/api/health
+
+(Replace 192.168.1.2 with MARVIN’s real IPv4.)
 
 Serving dist/?
 
@@ -304,7 +310,7 @@ Serving dist/?
         ]),
       );
       statusBar.textContent =
-        "Scanner API still hiding — MARVIN needs node server/index.mjs (port 8788) + npm run dev or preview:live!";
+        "Scanner API still hiding — start server/index.mjs on :8788 (listen 0.0.0.0) + npm run dev or preview:live!";
     }
   }
 

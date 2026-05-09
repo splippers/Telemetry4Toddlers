@@ -2,6 +2,8 @@ import http from "node:http";
 import { scanLan } from "./lanScan.mjs";
 
 const API_PORT = Number(process.env.T4T_API_PORT || 8788);
+/** `0.0.0.0` = all IPv4 interfaces (home LAN 192.168.1.x + loopback). Use `127.0.0.1` to disable LAN. */
+const API_HOST = process.env.T4T_API_HOST || "0.0.0.0";
 
 function sendJson(res, status, body) {
   const data = JSON.stringify(body);
@@ -47,7 +49,10 @@ const server = http.createServer(async (req, res) => {
   sendJson(res, 404, { error: "NOT_FOUND" });
 });
 
-server.listen(API_PORT, "127.0.0.1", () => {
+server.listen(API_PORT, API_HOST, () => {
+  const url = `http://${API_HOST === "0.0.0.0" ? "0.0.0.0" : API_HOST}:${API_PORT}`;
   // eslint-disable-next-line no-console
-  console.error(`[t4t-api] listening on http://127.0.0.1:${API_PORT}`);
+  console.error(
+    `[t4t-api] listening on ${url} ( reachable on LAN + localhost; set T4T_API_HOST=127.0.0.1 to lock down )`,
+  );
 });

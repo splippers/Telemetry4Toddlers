@@ -62,21 +62,22 @@ SNMP uses read-only credentials you supply (classic “community strings”). **
 | **`T4T_LAN_IFACE`** | NIC name (`enp2s0`, …) if MARVIN can’t infer the default route |
 | **`T4T_AUTH_FILE`** | Alternate JSON path describing SNMP secrets |
 | **`T4T_AUTH_DEVICES`** | Inline JSON overriding the secrets file |
-| **`T4T_API_PORT`** | API binds **`127.0.0.1:$PORT`** (default **8788**) |
+| **`T4T_API_HOST`** | Default **`0.0.0.0`** — listen on **all IPv4 NICs** (your **192.168.1.x** LAN plus loopback). Set **`127.0.0.1`** if you refuse LAN-direct API hits. |
+| **`T4T_API_PORT`** | Port (default **8788**) |
 
-The API stays localhost-only while **Vite proxies `/api/*`** during `npm run dev`, so DAD/other LAN browsers talk to **`http://<MARVIN-IP>:5173`** normally.
+**Vite** (`npm run dev` / `preview:live`) still proxies **`/api/*` → `http://127.0.0.1:8788`** from MARVIN, so tablets can use **`http://<MARVIN-LAN-IP>:5173`** only. With **`T4T_API_HOST=0.0.0.0`**, you *may* also call **`http://<MARVIN-LAN-IP>:8788/api/...`** directly (same subnet).
 
 ### Production-ish preview caveat
 
 **`npm run preview`** serves static **`dist/`** only—`/api` is missing unless you launch the LAN scout separately.
 
-Use **`npm run preview:live`** for one command that runs **`vite preview` + `server/index.mjs`** (same **`127.0.0.1:8788`** API + Vite **`/api` proxy)**.
+Use **`npm run preview:live`** for one command that runs **`vite preview` + `server/index.mjs`** (API on **`0.0.0.0:8788`** by default + Vite **`/api` proxy)**.
 
 ## Develop
 
 ```bash
 npm install
-npm run dev        # Vite (0.0.0.0:5173) + LAN API (127.0.0.1:8788) via concurrently
+npm run dev        # Vite (0.0.0.0:5173) + API (0.0.0.0:8788) via concurrently
 npm run dev:ui     # UI only (mock /api errors unless you also run dev:api)
 npm run dev:api    # API only
 npm run build      # static artefacts in dist/
