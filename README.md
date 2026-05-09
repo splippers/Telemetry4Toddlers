@@ -57,6 +57,8 @@ The API (`server/lanScan.mjs`) gathers:
 
 SNMP uses read-only credentials you supply (classic “community strings”). **Do not** ship those to GitHub—keep them in **`server/auth-devices.json`** (copy from **`server/auth-devices.example.json`**) or export **`T4T_AUTH_DEVICES`** JSON before launching the dev stack.
 
+**SNMP agents on fleet:** T4T polls only when a host answers UDP/161 — install **`snmpd` (Linux)** or the Windows SNMP feature per box. Playbook: **[`docs/SNMP_EVERYWHERE.md`](docs/SNMP_EVERYWHERE.md)** · Debian helper: **[`scripts/install-snmp-agent-debian.sh`](scripts/install-snmp-agent-debian.sh)**.
+
 | Env | Meaning |
 | --- | --- |
 | **`T4T_LAN_IFACE`** | NIC name (`enp2s0`, …) if MARVIN can’t infer the default route |
